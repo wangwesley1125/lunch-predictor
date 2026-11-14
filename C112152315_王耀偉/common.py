@@ -2,6 +2,9 @@ import pandas as pd
 from pathlib import Path
 import json
 
+# 評估指標
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
 DATA_DIR = Path(__file__).parent / "data"
 FEATURES = ["性別", "科系", "口味", "價格"]
 TARGET = "中餐"
@@ -39,7 +42,17 @@ def encode(df):
 # indent = 2 : 讓 JSON 檔案好閱讀
 def save_encoding():
     with open(Path(__file__).parent / "encoding.json", "w", encoding = "utf-8") as f:
-        json.dump(ENCODING, f, ensure_ascii = False, indent = 2)   
+        json.dump(ENCODING, f, ensure_ascii = False, indent = 2)
+
+# macro : 計算每個類別的指標後取平均
+# zero_division = 0 : 如果模型完全沒有猜過某一類。這個參數讓它算成 0，而不是跳出警告。
+def evaluate(y_true, y_pred):
+    return {
+        "Accuracy" : accuracy_score(y_true, y_pred),
+        "Precision" : precision_score(y_true, y_pred, average = "macro", zero_division = 0),
+        "Recall" : recall_score(y_true, y_pred, average = "macro", zero_division = 0),
+        "F1-Score" : f1_score(y_true, y_pred, average = "macro", zero_division = 0),
+    }
 
 # 自我測試
 if __name__ == "__main__":
